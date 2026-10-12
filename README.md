@@ -1,96 +1,110 @@
 # Matzo Vector Scope
 
-Vektorgrafik på ett analogt oscilloskop med NodeMCU/ESP8266. Två filtrerade PWM-utgångar styr X och Y. Projektet utvecklas med ett Hitachi V-212 i X–Y-läge.
+[![A complete green vector triangle on the Hitachi V-212 CRT](docs/images/oscilloscope-demo.jpg)](docs/videos/matzo-vector-scope-silent.mp4)
 
-## Demonstration
+**Turn a classic CRT oscilloscope into a vector display with a NodeMCU ESP8266.**
 
-[![Vektorgrafik på oscilloskopet](docs/images/oscilloscope-demo.jpg)](docs/videos/matzo-vector-scope-silent.mp4)
+Two filtered PWM outputs drive the X and Y inputs of a Hitachi V-212. The sketch draws rotating solids and smooth curves using integer arithmetic and a sine lookup table.
 
-[Öppna den ljudlösa demonstrationsvideon](docs/videos/matzo-vector-scope-silent.mp4). Videon är cirka 13 sekunder lång och sparad som MP4 i 1080p med originalets bildfrekvens. Alla ljudspår är borttagna. HDR-färgerna har anpassats för vanlig SDR-uppspelning.
+[Watch the silent demo](docs/videos/matzo-vector-scope-silent.mp4) · [Open the Arduino sketch](MatzoShapes.ino)
 
-## Former
+## The show
 
-Programmet visar en form i taget: kub, cirkel, oktaeder, tetraeder, pyramid, blomkurva, rymdskepp och en tredimensionell slinga. Det använder heltalsberäkningar och en sinustabell. Varje form visas i sju sekunder och hela showen upprepas.
+One continuous shape is drawn at a time:
 
-Text, stjärnbakgrund och separata vektorbollar ingår inte i den aktuella versionen.
+- Rotating cube and octahedron.
+- Breathing circle.
+- Tetrahedron and square pyramid.
+- Rotating flower curve.
+- A spacecraft with swept wings and a raised canopy.
+- A rotating 3D knot.
 
-## Delar
+Each shape runs for seven seconds before the next begins. The sequence repeats automatically.
 
-- NodeMCU med ESP8266.
-- Två motstånd på 4,7 kΩ.
-- Två kondensatorer på 100 nF, normalt märkta `104`.
-- Kopplingsdäck och ledningar.
-- Två prober eller BNC-kablar och ett oscilloskop med X–Y-läge.
-- USB-kabel som stöder dataöverföring.
+## Hardware
 
-## Koppling
+- NodeMCU ESP8266 board.
+- Two **4.7 kΩ** resistors.
+- Two **100 nF** capacitors, commonly marked `104`.
+- Breadboard, jumper wires and a USB data cable.
+- Two oscilloscope probes or BNC leads.
+- An oscilloscope with X–Y mode.
 
-| NodeMCU | GPIO i koden | Oscilloskop |
+## Wiring
+
+| NodeMCU pin | GPIO used in the sketch | Oscilloscope input |
 | --- | --- | --- |
-| D1 | 5 | CH1 / X |
-| D2 | 4 | CH2 / Y |
-| GND | — | Båda probjordarna och kondensatorernas jordben |
+| **D1** | **5** | **CH1 / X** |
+| **D2** | **4** | **CH2 / Y** |
+| **GND** | — | Both probe grounds and both capacitor ground connections |
 
-Varje kanal har ett eget RC-filter. Anslut probspetsen efter motståndet, på samma punkt som kondensatorns signalben:
+Build a separate RC filter for each output. Connect the probe tip **after the resistor**, at the same junction as the capacitor's signal lead:
 
 ```text
-D1 ──[4,7 kΩ]──┬──── CH1 / X
+D1 ──[4.7 kΩ]──┬──── CH1 / X
                │
              [100 nF]
                │
               GND
 
-D2 ──[4,7 kΩ]──┬──── CH2 / Y
+D2 ──[4.7 kΩ]──┬──── CH2 / Y
                │
              [100 nF]
                │
               GND
 ```
 
-Mata NodeMCU via USB. Anslut oscilloskopets jordklämmor till kretsens GND. Kondensatorerna laddas och laddas ur genom motstånden, så att PWM-pulserna blir en jämnare analog spänning. Filtrets tidskonstant är cirka 470 µs och dess gränsfrekvens cirka 339 Hz.
+Power the board through USB. All circuit grounds must be connected together. Attach the oscilloscope ground clips to circuit GND.
 
-## Ladda upp
+The resistors and capacitors smooth the PWM pulses into changing analog voltages. Each filter has a time constant of approximately **470 µs** and a cutoff frequency of approximately **339 Hz**.
 
-1. Installera ESP8266-kortstödet i Arduino IDE enligt [projektets installationsanvisning](https://arduino-esp8266.readthedocs.io/en/latest/installing.html).
-2. Öppna `MatzoShapes.ino`. Behåll filen i en mapp som heter `MatzoShapes` när du öppnar den med Arduino IDE.
-3. Välj **NodeMCU 1.0 (ESP-12E Module)** och kortets USB-port.
-4. Börja med **Upload Speed: 115200** och ladda upp.
-5. Öppna Serial Monitor på **115200 baud** om du vill se scenbytena.
+## Upload with Arduino IDE
 
-Om uppladdningen fastnar vid `Connecting...`, koppla först bort externa anslutningar. Håll sedan FLASH inne och tryck kort på RST. Släpp FLASH när uppladdningen börjar.
+1. Install the ESP8266 board package using the [official installation guide](https://arduino-esp8266.readthedocs.io/en/latest/installing.html).
+2. Download [`MatzoShapes.ino`](MatzoShapes.ino) and open it in Arduino IDE. Accept the IDE's offer to place it in a folder named **MatzoShapes**, or create that folder yourself.
+3. Select **NodeMCU 1.0 (ESP-12E Module)** and the board's USB port.
+4. Start with **Upload Speed: 115200**, then upload.
+5. Open Serial Monitor at **115200 baud** to see the scene numbers.
 
-## Hitachi V-212
+If uploading stalls at `Connecting...`, disconnect external wiring first. Hold **FLASH**, briefly press **RST**, and release FLASH once writing begins.
 
-- TIME/DIV: **X–Y**.
-- CH1 och CH2: **DC-koppling**.
-- Börja med **0,5 V/div** på båda kanalerna.
-- Båda VAR-rattarna i **CAL** och förstärkningsrattarna intryckta.
-- Använd samma probfaktor på båda kanalerna; ×1 passar för första försöket.
-- Centrera bilden och håll ljusstyrkan måttlig. Lämna inte en stark, stillastående punkt på skärmen.
+## Set up the Hitachi V-212
 
-## Justeringar
+- Set **TIME/DIV to X–Y**.
+- Set both input coupling switches to **DC**.
+- Start at **0.5 V/div** on both channels.
+- Set both **VAR** controls to **CAL**, with the gain controls pushed in.
+- Use the same probe factor on both channels; **×1** is suitable for the first test.
+- Center the image and keep the intensity moderate. Avoid leaving a bright stationary dot on the CRT.
 
-Ändra konstanterna högst upp i programmet:
+## Adjust the animation
 
-| Inställning | Standard | Effekt |
+Edit the constants near the top of the sketch:
+
+| Setting | Default | What it changes |
 | --- | --- | --- |
-| `MOTION_SPEED` | `2` | Rörelsehastighet. Prova `1`, `2` eller `3`. |
-| `AMPLITUDE` | `100` | Figurernas storlek. Lägre värde ger mindre bild. |
-| `POINT_US` | `80` | Väntetid vid varje ritpunkt. Lägre värde kan ge mer avrundning. |
-| `SCENE_MS` | `7000` | Tid i millisekunder per form. |
+| `MOTION_SPEED` | `2` | Animation speed. Try `1`, `2` or `3`. |
+| `AMPLITUDE` | `100` | Image size. Reduce it for a smaller image. |
+| `POINT_US` | `80` | Dwell time at each point. Reducing it can increase rounding. |
+| `SCENE_MS` | `7000` | Duration of each shape, in milliseconds. |
 
-PWM-frekvensen är 20 kHz. `analogWriteFreq()` stöder upp till 40 kHz i ESP8266:s Arduino-stöd, men högre frekvens belastar processorn mer. Ändra en inställning i taget. [PWM-dokumentation](https://arduino-esp8266.readthedocs.io/en/latest/reference.html#analog-output).
+PWM runs at **20 kHz**. ESP8266 Arduino supports settings up to **40 kHz**, but software PWM consumes more CPU time as frequency increases. Change one setting at a time. See the [PWM reference](https://arduino-esp8266.readthedocs.io/en/latest/reference.html#analog-output).
 
-## Status och begränsningar
+Increasing `MOTION_SPEED` makes objects move faster while preserving the time allowed for the filters to follow each traced line.
 
-Enklare vektorformer har fungerat på den fysiska uppkopplingen. Den aktuella versionen har byggts utan fel för **NodeMCU 1.0 / ESP8266**, med **ESP8266 Arduino Core 3.1.2** och kortprofilen `esp8266:esp8266:nodemcuv2`.
+## Verification and limitations
 
-Geometriska banor har kontrollerats för giltiga hörnreferenser, slutna banor och signalutslag vid samplade rotationer. En separat lokal kontroll med simulerade Arduino-anrop körde alla åtta scener, kontrollerade PWM-värdena och verifierade att scenloopen återgick till kuben. Videofilen har avkodats i sin helhet och verifierats sakna ljudspår.
+The current sketch builds successfully for **NodeMCU 1.0 / ESP8266** using **ESP8266 Arduino Core 3.1.2** and board profile `esp8266:esp8266:nodemcuv2`.
 
-Byggkontrollerna bekräftar att programmet kompilerar, men den aktuella showens slutliga utseende behöver fortfarande bedömas på oscilloskopet.
+Additional checks covered valid vertex references, closed drawing paths and output bounds at sampled rotations. A local simulation ran all eight scenes, checked PWM values and verified that the sequence returns to the cube.
 
-RC-filtren rundar av hörn och lämnar kvar viss PWM-rippel. Ingen Z-släckning används. Därför passar sammanhängande ritbanor bättre än många separata punkter eller textstreck.
+The RC filters soften corners and leave some PWM ripple. No Z-axis blanking is implemented, so the show uses continuous paths rather than disconnected stars or text strokes. The final appearance of the current show still needs to be assessed on the physical oscilloscope.
 
-## Bilder
+## Demo and project media
 
-Projektbilder läggs i [`docs/images/`](docs/images/) och videor i [`docs/videos/`](docs/videos/). Koppling, oscilloskopinställningar och fler exempel på former kan läggas till i nästa iteration.
+The demonstration is approximately **13 seconds**, encoded as **1080p H.264 MP4** at the original frame rate. **All audio tracks have been removed.** HDR footage was converted to SDR for ordinary playback. The entire output video was decoded successfully and verified to contain no audio streams.
+
+The video shows the hardware in action; it is not a recording of every shape in the current sketch.
+
+- Images: [`docs/images/`](docs/images/)
+- Video: [`docs/videos/`](docs/videos/)
