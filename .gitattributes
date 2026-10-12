@@ -1,0 +1,9 @@
+* text=auto
+*.ino text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.mp4 binary
+*.mov binary

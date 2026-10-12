@@ -1,0 +1,21 @@
+# Generated firmware and build output
+build/
+.pio/
+*.bin
+*.elf
+*.map
+*.hex
+*.o
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local credentials
+.env
+.env.*
+*.key
+*.pem
