@@ -21,6 +21,10 @@ One continuous shape is drawn at a time:
 
 Each shape runs for seven seconds before the next begins. The sequence repeats automatically.
 
+## Experimental corridor tour
+
+Try the separate [Matzo Corridor walkthrough](examples/MatzoCorridor/README.md): a non-playable, Wolfenstein-inspired four-room tour drawn as perspective outlines. It uses the same wiring and an original map. The main shapes show remains a separate sketch.
+
 ## Hardware
 
 - NodeMCU ESP8266 board.
